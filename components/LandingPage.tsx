@@ -1,13 +1,27 @@
 import { motion } from 'motion/react';
-import { ArrowRight, Star, Shield, Clock, Users, Zap, Wrench, Thermometer, Droplets, Sparkles, Building2, Briefcase, DollarSign } from 'lucide-react';
+import { ArrowRight, Star, Shield, Clock, Users, Zap, Wrench, Thermometer, Droplets, Sparkles, Building2, Briefcase, DollarSign, Wind, Video, WashingMachine, Paintbrush, Hammer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export default function LandingPage({ onStart }: { onStart: () => void }) {
+export default function LandingPage({ 
+  onStart,
+  onStartWithTab 
+}: { 
+  onStart: () => void;
+  onStartWithTab?: (tab: 'home' | 'orders' | 'finance' | 'account', subTab?: 'new' | 'history') => void;
+}) {
+  const handleSelectFeature = (tab: 'home' | 'orders' | 'finance' | 'account', subTab?: 'new' | 'history') => {
+    if (onStartWithTab) {
+      onStartWithTab(tab, subTab);
+    } else {
+      onStart();
+    }
+  };
+
   return (
     <div className="pt-20">
       <Hero onStart={onStart} />
-      <ServicesSection onSelect={onStart} />
-      <FeaturesSection />
+      <ServicesSection onSelect={() => handleSelectFeature('orders', 'new')} />
+      <FeaturesSection onSelectFeature={handleSelectFeature} />
       <HowItWorks />
       <PricingSection />
       <TestimonialsSection />
@@ -22,12 +36,12 @@ function Hero({ onStart }: { onStart: () => void }) {
       {/* Real Technician Background Image */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1599833719482-10343af30171?auto=format&fit=crop&q=80&w=2000" 
-          alt="Teknisi Servis Profesional" 
+          src="https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&q=80&w=2000" 
+          alt="Professional Cleaning Service Team" 
           className="w-full h-full object-cover"
         />
-        {/* Overlay yang lebih seimbang agar foto tetap terlihat jelas */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-black/10" />
+        {/* Adjusted overlay to keep text readable while showing more of the photo */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-black/20" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10 w-full">
@@ -119,12 +133,15 @@ function Hero({ onStart }: { onStart: () => void }) {
 }
 
 const services = [
-  { name: 'Servis AC', icon: Thermometer, color: 'bg-blue-100 text-blue-600' },
-  { name: 'Listrik', icon: Zap, color: 'bg-yellow-100 text-yellow-600' },
-  { name: 'Ledeng', icon: Droplets, color: 'bg-cyan-100 text-cyan-600' },
-  { name: 'Kebersihan', icon: Sparkles, color: 'bg-purple-100 text-purple-600' },
-  { name: 'Renovasi', icon: Building2, color: 'bg-orange-100 text-orange-600' },
-  { name: 'Peralatan', icon: Wrench, color: 'bg-red-100 text-red-600' },
+  { name: 'Servis AC', description: 'AC Service', icon: Wind, color: 'bg-blue-100 text-blue-600' },
+  { name: 'Listrik', description: 'Electricity', icon: Zap, color: 'bg-yellow-100 text-yellow-600' },
+  { name: 'Ledeng', description: 'Plumbing', icon: Droplets, color: 'bg-cyan-100 text-cyan-600' },
+  { name: 'Kebersihan', description: 'Cleaning', icon: Sparkles, color: 'bg-purple-100 text-purple-600' },
+  { name: 'Renovasi', description: 'Renovation', icon: Hammer, color: 'bg-orange-100 text-orange-600' },
+  { name: 'Instalasi CCTV', description: 'CCTV Installation', icon: Video, color: 'bg-indigo-100 text-indigo-600' },
+  { name: 'Mesin Cuci', description: 'Washing Machine', icon: WashingMachine, color: 'bg-red-100 text-red-600' },
+  { name: 'Cat Rumah', description: 'House Paint', icon: Paintbrush, color: 'bg-emerald-100 text-emerald-600' },
+  { name: 'Lainnya', description: 'Others', icon: Wrench, color: 'bg-gray-100 text-gray-600' },
 ];
 
 function ServicesSection({ onSelect }: { onSelect: () => void }) {
@@ -137,7 +154,7 @@ function ServicesSection({ onSelect }: { onSelect: () => void }) {
             Tenaga ahli terpercaya siap membantu semua kebutuhan perawatan rumah Anda.
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {services.map((service, idx) => (
             <motion.div
               whileHover={{ y: -5 }}
@@ -148,7 +165,8 @@ function ServicesSection({ onSelect }: { onSelect: () => void }) {
               <div className={cn("w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform", service.color)}>
                 <service.icon size={32} />
               </div>
-              <h3 className="font-bold text-gray-900">{service.name}</h3>
+              <h3 className="font-bold text-gray-900 leading-tight mb-1">{service.name}</h3>
+              <p className="text-xs text-gray-400 font-medium font-mono">{service.description}</p>
             </motion.div>
           ))}
         </div>
@@ -157,14 +175,18 @@ function ServicesSection({ onSelect }: { onSelect: () => void }) {
   );
 }
 
-function FeaturesSection() {
+function FeaturesSection({ 
+  onSelectFeature 
+}: { 
+  onSelectFeature: (tab: 'home' | 'orders' | 'finance' | 'account', subTab?: 'new' | 'history') => void 
+}) {
   const features = [
-    { title: 'Manajemen Pesanan', desc: 'Pantau dan kelola semua pesanan layanan Anda di satu tempat.', icon: Briefcase },
-    { title: 'Penjadwalan Otomatis', desc: 'Jadwalkan teknisi secara otomatis sesuai kenyamanan Anda.', icon: Clock },
-    { title: 'Database Pelanggan', desc: 'Simpan dan kelola informasi pelanggan dengan aman.', icon: Users },
-    { title: 'Riwayat Layanan', desc: 'Pantau semua perbaikan dan perawatan yang dilakukan di rumah Anda.', icon: Star },
-    { title: 'Laporan Keuangan', desc: 'Visibilitas pengeluaran dan biaya layanan yang jelas.', icon: DollarSign },
-    { title: 'Notifikasi Instan', desc: 'Tetap terinformasi dengan peringatan dan pengingat real-time.', icon: Zap },
+    { title: 'Manajemen Pesanan', desc: 'Pantau dan kelola semua pesanan layanan Anda di satu tempat.', icon: Briefcase, tab: 'orders' as const, subTab: 'history' as const },
+    { title: 'Penjadwalan Otomatis', desc: 'Jadwalkan teknisi secara otomatis sesuai kenyamanan Anda.', icon: Clock, tab: 'orders' as const, subTab: 'new' as const },
+    { title: 'Database Pelanggan', desc: 'Simpan dan kelola informasi pelanggan dengan aman.', icon: Users, tab: 'account' as const },
+    { title: 'Riwayat Layanan', desc: 'Pantau semua perbaikan dan perawatan yang dilakukan di rumah Anda.', icon: Star, tab: 'orders' as const, subTab: 'history' as const },
+    { title: 'Laporan Keuangan', desc: 'Visibilitas pengeluaran dan biaya layanan yang jelas.', icon: DollarSign, tab: 'finance' as const },
+    { title: 'Notifikasi Instan', desc: 'Tetap terinformasi dengan peringatan dan pengingat real-time.', icon: Zap, tab: 'account' as const },
   ];
 
   return (
@@ -174,17 +196,26 @@ function FeaturesSection() {
           <div className="lg:w-1/2 mb-12 lg:mb-0">
             <h2 className="text-4xl font-bold mb-6 italic-small text-primary">Fitur Unggulan</h2>
             <p className="text-4xl lg:text-5xl font-bold mb-8 text-gray-900 leading-tight">Semua yang Anda butuhkan untuk mengelola rumah</p>
-            <div className="grid sm:grid-cols-2 gap-8">
+            <div className="grid sm:grid-cols-2 gap-4">
               {features.map((f, i) => (
-                <div key={i} className="flex gap-4">
-                  <div className="shrink-0 w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary border border-gray-100">
+                <motion.button
+                  whileHover={{ scale: 1.02, backgroundColor: 'rgba(255, 255, 255, 0.7)' }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => onSelectFeature(f.tab, f.subTab)}
+                  key={i}
+                  className="flex gap-4 p-4 text-left rounded-3xl transition-all border border-transparent hover:border-primary/10 hover:shadow-lg hover:shadow-primary/5 cursor-pointer w-full group outline-none"
+                >
+                  <div className="shrink-0 w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary border border-gray-100 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
                     <f.icon size={24} />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">{f.title}</h4>
-                    <p className="text-sm text-gray-600">{f.desc}</p>
+                    <h4 className="font-bold mb-1 text-gray-900 group-hover:text-primary transition-colors flex items-center gap-1.5">
+                      {f.title}
+                      <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0" />
+                    </h4>
+                    <p className="text-xs text-gray-650 leading-relaxed font-semibold">{f.desc}</p>
                   </div>
-                </div>
+                </motion.button>
               ))}
             </div>
           </div>
@@ -244,9 +275,9 @@ function HowItWorks() {
 
 function PricingSection() {
   const plans = [
-    { name: 'Basic', price: 'Rp 50rb', period: '/bulan', features: ['5 Teknisi', 'Laporan Standar', 'Dukungan Email'] },
-    { name: 'Pro', price: 'Rp 100rb', period: '/bulan', popular: true, features: ['20 Teknisi', 'Analitik Lanjutan', 'Alat Manajemen', 'Dukungan Prioritas'] },
-    { name: 'Business', price: 'Rp 200rb', period: '/bulan', features: ['Teknisi Tanpa Batas', 'White-label Penuh', 'Akses API', 'Manager Akun 24/7'] },
+    { name: 'Basic', price: 'Rp 50rb', period: '/bulan', discount: 'Diskon 20%', features: ['5 Teknisi', 'Laporan Standar', 'Dukungan Email'] },
+    { name: 'Pro', price: 'Rp 100rb', period: '/bulan', discount: 'Diskon 25%', popular: true, features: ['20 Teknisi', 'Analitik Lanjutan', 'Alat Manajemen', 'Dukungan Prioritas'] },
+    { name: 'Business', price: 'Rp 200rb', period: '/bulan', discount: 'Diskon 30%', features: ['Teknisi Tanpa Batas', 'White-label Penuh', 'Akses API', 'Manager Akun 24/7'] },
   ];
 
   return (
@@ -259,14 +290,24 @@ function PricingSection() {
         </div>
         <div className="grid lg:grid-cols-3 gap-8">
           {plans.map((p, i) => (
-            <div key={i} className={cn("p-8 rounded-3xl transition-all relative overflow-hidden", p.popular ? "bg-primary text-white shadow-2xl scale-105 z-10" : "bg-white text-gray-900 border border-gray-100")}>
+            <div key={i} className={cn("p-8 rounded-3xl transition-all relative overflow-hidden flex flex-col", p.popular ? "bg-primary text-white shadow-2xl scale-105 z-10" : "bg-white text-gray-900 border border-gray-100")}>
               {p.popular && <div className="absolute top-4 right-4 bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Paling Populer</div>}
-              <h4 className="text-xl font-bold mb-4">{p.name}</h4>
-              <div className="flex items-baseline gap-1 mb-8">
+              
+              <div className="flex justify-between items-start mb-4">
+                <h4 className="text-xl font-bold">{p.name}</h4>
+                <div className={cn("px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider", p.popular ? "bg-white/20 text-white" : "bg-primary/10 text-primary")}>
+                  {p.discount}
+                </div>
+              </div>
+
+              <div className="flex items-baseline gap-1 mb-2">
                 <span className="text-4xl font-black">{p.price}</span>
                 <span className={cn("text-sm", p.popular ? "text-white/60" : "text-gray-500")}>{p.period}</span>
               </div>
-              <ul className="space-y-4 mb-8">
+              
+              <p className={cn("text-xs font-medium mb-8", p.popular ? "text-white/70" : "text-gray-500")}>Hemat Biaya Layanan</p>
+
+              <ul className="space-y-4 mb-8 flex-grow">
                 {p.features.map((f, j) => (
                   <li key={j} className="flex items-center gap-3">
                     <Shield size={18} className={p.popular ? "text-white/40" : "text-primary/20"} />

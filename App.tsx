@@ -2,18 +2,86 @@ import { useState } from 'react';
 import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard';
 import Navbar from './components/Navbar';
+import AuthPage from './components/AuthPage';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [view, setView] = useState<'landing' | 'dashboard'>('landing');
+  const [dashboardTab, setDashboardTab] = useState<'home' | 'orders' | 'finance' | 'account'>('home');
+  const [ordersSubTab, setOrdersSubTab] = useState<'new' | 'history'>('history');
+  const [bookingStep, setBookingStep] = useState(0);
+
+  // Shared application state
+  const [balance, setBalance] = useState(450000);
+  
+  const [orders, setOrders] = useState([
+    { id: 'HC-9021', service: 'Servis AC', status: 'Dalam Proses', price: 'Rp 150.000', date: 'Hari Ini', time: '14:00', paymentMethod: 'e-wallet', technician: 'Supriyadi', description: 'AC meneteskan air dan kurang dingin di kamar utama.' },
+    { id: 'HC-9020', service: 'Kebersihan', status: 'Selesai', price: 'Rp 80.000', date: '1 Mei 2026', time: '11:00', paymentMethod: 'e-wallet', technician: 'Suparno', description: 'Deep clean area dapur dan ruang makan.' },
+    { id: 'HC-8998', service: 'Ledeng', status: 'Selesai', price: 'Rp 100.000', date: '12 Apr 2026', time: '09:00', paymentMethod: 'qr', technician: 'Fajar Widodo', description: 'Pipa wastafel cuci piring tersumbat air kotor.' },
+  ]);
+
+  const [transactions, setTransactions] = useState([
+    { id: 'TX-8802', type: 'debit', title: 'Pembayaran Servis AC HC-9021', amount: 'Rp 150.000', date: 'Hari Ini, 14:00', status: 'Selesai' },
+    { id: 'TX-8801', type: 'credit', title: 'Isi Saldo (Top-Up) Dompet', amount: 'Rp 200.000', date: '19 Mei 2026, 10:15', status: 'Selesai' },
+    { id: 'TX-8799', type: 'debit', title: 'Pembayaran Kebersihan Rumah HC-9020', amount: 'Rp 80.000', date: '1 Mei 2026, 11:30', status: 'Selesai' },
+    { id: 'TX-8798', type: 'credit', title: 'Cashback Dompet Berkah', amount: 'Rp 15.000', date: '1 Mei 2026, 11:45', status: 'Selesai' },
+  ]);
+
+  const [profile, setProfile] = useState({
+    name: 'Resfin Firdani',
+    email: 'resfinfirdani8@gmail.com',
+    phone: '083176558460',
+    address: 'Residence Blok A, Pamulang, Tangerang Selatan',
+    memberTier: 'Premium Gold Member',
+  });
+
+  const handleNavigateToTab = (tab: 'home' | 'orders' | 'finance' | 'account', subTab?: 'new' | 'history') => {
+    setDashboardTab(tab);
+    if (subTab) {
+      setOrdersSubTab(subTab);
+    }
+    if (subTab === 'new') {
+      setBookingStep(0);
+    }
+    setView('dashboard');
+  };
+
+  if (!isAuthenticated) {
+    return <AuthPage onAuthSuccess={() => setIsAuthenticated(true)} />;
+  }
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar onNavigate={(v) => setView(v)} currentView={view} />
+      <Navbar 
+        onNavigate={(v) => setView(v)} 
+        currentView={view} 
+        onLogout={() => setIsAuthenticated(false)} 
+        dashboardTab={dashboardTab}
+        onSelectDashboardTab={handleNavigateToTab}
+      />
       <main>
         {view === 'landing' ? (
-          <LandingPage onStart={() => setView('dashboard')} />
+          <LandingPage 
+            onStart={() => handleNavigateToTab('home')} 
+            onStartWithTab={handleNavigateToTab}
+          />
         ) : (
-          <Dashboard />
+          <Dashboard 
+            activeTab={dashboardTab}
+            setActiveTab={setDashboardTab}
+            balance={balance}
+            setBalance={setBalance}
+            orders={orders}
+            setOrders={setOrders}
+            transactions={transactions}
+            setTransactions={setTransactions}
+            profile={profile}
+            setProfile={setProfile}
+            bookingStep={bookingStep}
+            setBookingStep={setBookingStep}
+            ordersSubTab={ordersSubTab}
+            setOrdersSubTab={setOrdersSubTab}
+          />
         )}
       </main>
       
